@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Attendance App</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 800px; /* Adjusted maximum width for better readability */
+            width: 100%;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #343a40;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        label {
+            background-color: #007bff;
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: inline-block;
+            font-size: 16px;
+        }
+
+        label:hover {
+            background-color: #0056b3;
+        }
+
+        button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .error,
+        .success {
+            margin-top: 20px;
+            padding: 10px; /* Added padding for better visibility */
+        }
+
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da; /* Added background color for error messages */
+        }
+
+        .success {
+            color: #28a745;
+            background-color: #d4edda; /* Added background color for success messages */
+        }
+
+        .file-name {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .loading {
+            margin-top: 20px;
+            display: none;
+        }
+
+        /* Add style for detected faces */
+        .detected-face {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap; /* Added flex-wrap to handle smaller screens */
+            justify-content: center;
+        }
+
+        .detected-face img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Face Attendance App</h1>
+
+        <form action="/upload" method="post" enctype="multipart/form-data" onsubmit="showLoadingMessage()">
+            <input type="file" name="file" id="fileInput" accept="image/*" required onchange="updateFileName()">
+            <label for="fileInput">Choose Image</label>
+            <div class="file-name" id="fileName">No file chosen</div>
+            <button type="submit">Upload & Detect Faces</button>
+        </form>
+
+        <div class="loading" id="loadingMessage">Detecting faces... <img
+                src="{{ url_for('static', filename='loading.gif') }}" alt="Loading"></div>
+        <div class="success" id="successMessage" style="display: none;">Face detection completed. Attendance assigned
+            successfully.</div>
+
+        <!-- Placeholder for detected faces -->
+        <div id="detectedFacesContainer" class="detected-face">
+            <!-- Detected faces will be displayed here -->
+        </div>
+
+        {% if error %}
+        <p class="error">{{ error }}</p>
+        {% endif %}
+    </div>
+
+    <script>
+        function updateFileName() {
+            const fileInput = document.getElementById('fileInput');
+            const fileNameDisplay = document.getElementById('fileName');
+            fileNameDisplay.textContent = fileInput.files[0] ? fileInput.files[0].name : 'No file chosen';
+        }
+
+        function showLoadingMessage() {
+            const loadingMessage = document.getElementById('loadingMessage');
+            const successMessage = document.getElementById('successMessage');
+            const detectedFacesContainer = document.getElementById('detectedFacesContainer');
+            const fileInput = document.getElementById('fileInput');
+
+            loadingMessage.style.display = 'block';
+
+            // Check if a file is selected
+            if (fileInput.files.length > 0) {
+                // Create an Image element for the uploaded image
+                const uploadedImage = new Image();
+                uploadedImage.src = URL.createObjectURL(fileInput.files[0]);
+                uploadedImage.alt = 'Uploaded Image';
+
+                // Append the Image element to the detectedFacesContainer
+                detectedFacesContainer.appendChild(uploadedImage);
+            }
+
+            // Simulate a delay (you can remove this setTimeout in your actual implementation)
+            setTimeout(() => {
+                loadingMessage.style.display = 'none';
+                successMessage.style.display = 'block';
+
+                // Clear the content of detectedFacesContainer
+                detectedFacesContainer.innerHTML = '';
+
+                // Get the detected faces data from the server (replace with actual logic)
+                const detected_faces_data = {
+                    "success": "File uploaded and faces detected successfully",
+                    "detected_faces": [
+                    
+                    ],
+                    "detected_image_path": "path_to_detected_image",
+                    "encoded_image": "base64_encoded_image"
+                };
+
+                // Display the detected faces
+                if (detected_faces_data.detected_faces) {
+                    detected_faces_data.detected_faces.forEach(face => {
+                        const faceImage = new Image();
+                        faceImage.src = face.path;
+                        faceImage.alt = face.alt;
+
+                        detectedFacesContainer.appendChild(faceImage);
+                    });
+                }
+
+                // Optionally, you can handle the detected_image_path and encoded_image as needed
+            }, 2000); // Simulating a 2-second delay
+        }
+    </script>
+</body>
+
+</html>
