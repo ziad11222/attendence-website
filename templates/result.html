@@ -22,14 +22,11 @@
                         <li>
                             <p><strong>Face Image:</strong></p>
                             <img  class="predicted_small_image" src="data:image/png;base64,{{ face.encoded_face_image }}" alt="Detected Face">
-                            <p><strong>Label:</strong> {{ face.label.replace("_"," ") }}</p>
+                            <p><strong>Name:</strong> {{ face.label.replace("_","\n ID:") }}</p>
                         </li>
                     {% endfor %}
                 </ul>
-
-                <p><strong>Detected Image Path:</strong> {{ detected_image_path }}</p>
-
-                <p><strong>Encoded Image:</strong></p>
+                <p><strong>Input Image:</strong></p>
                 <img src="data:image/jpeg;base64,{{ encoded_image }}" alt="Detected Image" style="width: 100%;">
             {% else %}
                 <p>No faces detected in the uploaded image.</p>
